@@ -38,6 +38,7 @@ class GUI():
         _game_board = tile_array(_game_board, _s_.RENDER_SCALING,
                                               _s_.RENDER_SCALING)
         cv.imshow(self.wname, _game_board)
+        cv.waitKey(_s_.RENDER_FPS_MS)
 
 
 # def test():
