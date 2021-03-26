@@ -11,5 +11,5 @@ while True:
     g.reset()
     failed = False
     while not(failed):
-        board, failed = g.step(np.random.randint(0, 3))
+        board, failed = g.step(np.random.randint(0, 4))
         window.update_frame(board)
