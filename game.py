@@ -19,7 +19,7 @@ class Game:
         player_pos += self.actions[action] ## Bug
         self.board[tuple(player_pos)] = 1 + self.player_turn
         failed = self.board[tuple(player_pos)] != 0
-        self.player_turn = self.player_turn + 1 % 2
+        self.player_turn = (self.player_turn + 1) % 2
         return self.board, failed
 
 Game()
