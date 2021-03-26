@@ -1,3 +1,4 @@
+import numpy as np
 from gui import GUI
 from game import Game
 

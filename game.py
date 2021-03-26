@@ -16,7 +16,7 @@ class Game:
     def step(self, action):
         player_pos = self.players[self.player_turn]
         self.board[tuple(player_pos)] += 2
-        player_pos += self.actions(action)
+        player_pos += self.actions[action] ## Bug
         self.board[tuple(player_pos)] = 1 + self.player_turn
         failed = self.board[tuple(player_pos)] != 0
         self.player_turn = self.player_turn + 1 % 2

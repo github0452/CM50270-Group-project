@@ -1,4 +1,5 @@
 MAP_SIZE = 16
+RENDER_SCALING = 20
 
 
 
