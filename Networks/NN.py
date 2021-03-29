@@ -28,14 +28,22 @@ class FeedForward(nn.Sequential):
         ) #initialise nn.Modules
 
 class Network(nn.Module):
-    def __init__(self, inplanes=128, planes=4, kernal=3, padding=1, layers=3, strides_sizes, n_layers, downsample=None):
-        self.L_encoder = nn.Sequential(*(ResidueBlock(inplanes, planes, kernal, strides_sizes, padding, layers) for i in range(n_layers)))
-        self.ff = FeedForward(16*16 + 4, 512)
-        self.ff2 = nn.Linear(16*16 +4, 4)
+    def __init__(self, planes=4, kernal=3, padding=1, layers=3, n_layers=3, \
+    strides_sizes=[2, 1, 1]):
+        self.L_embedder = ResidueBlock(1, planes, kernal, strides_sizes[0], padding, layers)
+        self.L_encoder = nn.Sequential(*(\
+            ResidueBlock(planes, planes, kernal, strides_sizes[i], padding, layers)\
+             for i in range(1, n_layers)))
+        self.ff1 = FeedForward(260, 512, dim_out=256)
+        self.ff2 = nn.Linear(256, 4)
 
-    def forward(self, x):
-        inputs = self.L_encoder(x)
-        #also concatenate additional information to the linear layer
-        # additional information: 4 blocks around head, distance to the nearest block
-        inputs = self.ff(inputs)
+    def forward(self, x, dlc):
+        inputs = self.L_embedder(x) #[height, width, 4]
+        inputs = self.L_encoder(inputs) #[height/2, width/2, 4]
+        inputs = F.interpolate(inputs, size=(16, 16), align_corner=False, mode='Bicubic').flatten() #[16, 16]
+        inputs = inputs.flatten() #[256]
+        inputs = torch.cat((inputs, dlc), dim=0) #[260]
+        inputs = self.ff1(inputs) #[260]
+        inputs = nn.ReLU(inputs) #[260]
+        inputs = self.ff2(inputs) #[4]
         return inputs
