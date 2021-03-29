@@ -5,7 +5,7 @@ from game import Game
 g = Game()
 window = GUI()
 
-print(g.reset())
+g.reset()
 
 while True:
     g.reset()
