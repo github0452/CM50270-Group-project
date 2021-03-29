@@ -1,3 +1,19 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
+
+class Normalization(nn.Module):
+    def __init__(self, embed_dim, normalization='batch'):
+        super(Normalization, self).__init__()
+        normalizer_class = {
+            'batch': nn.BatchNorm1d,
+            'instance': nn.InstanceNorm1d
+        }.get(normalization, None)
+        self.normalizer = normalizer_class(embed_dim, affine=True)
+        # Normalization by default initializes affine parameters with bias 0 and weight unif(0,1) which is too large!
+        # self.init_parameters()
+
 class ResidueBlock(nn.Module):
     def __init__(self, inplanes=128, planes=128, kernel_size=3, stride=1, padding=1, downsample=None):
         super(ResBlock, self).__init__()
@@ -40,9 +56,8 @@ class Network(nn.Module):
     def forward(self, x, dlc):
         inputs = self.L_embedder(x) #[height, width, 4]
         inputs = self.L_encoder(inputs) #[height/2, width/2, 4]
-        inputs = F.interpolate(inputs, size=(16, 16), align_corner=False, mode='Bicubic').flatten() #[16, 16]
-        inputs = inputs.flatten() #[256]
-        inputs = torch.cat((inputs, dlc), dim=0) #[260]
+        inputs = F.interpolate(inputs, size=(16, 16), align_corner=False, mode='Bicubic') #[16, 16]
+        inputs = torch.cat((inputs.flatten(), dlc), dim=0) #[260]
         inputs = self.ff1(inputs) #[260]
         inputs = nn.ReLU(inputs) #[260]
         inputs = self.ff2(inputs) #[4]
