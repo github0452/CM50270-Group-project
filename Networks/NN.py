@@ -18,21 +18,25 @@ class Normalization(nn.Module):
 class ResidueBlock(nn.Module):
     def __init__(self, inplanes=128, planes=128, kernel_size=3, stride=1, padding=1, downsample=None):
         super(ResidueBlock, self).__init__()
+        print('my inplane', inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=kernel_size, stride=stride,
                                padding=padding, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=kernel_size, stride=stride,
+
+
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=kernel_size, stride=1,
                                padding=padding, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
+        self.stride = stride
 
     def forward(self, x):
         residual = x
-        out = self.conv1(x)
-        out = F.relu(self.bn1(out))
+        out1 = self.conv1(x)
+        out = F.relu(self.bn1(out1))
         out = self.conv2(out)
         out = self.bn2(out)
-        out += residual
-        out = F.relu(out)
+        out += residual if self.stride == 1 else out1
+        out = F.relu(out) 
         return out
 
 
@@ -49,19 +53,23 @@ class FeedForward(nn.Sequential):
 class Network(nn.Module):
     def __init__(self, planes=4, kernal=3, padding=1, layers=3, n_layers=3, \
                  strides_sizes=[2, 1, 1]):
+        super(Network, self).__init__()
         self.L_embedder = ResidueBlock(1, planes, kernal, strides_sizes[0], padding, layers)
         self.L_encoder = nn.Sequential(*( \
             ResidueBlock(planes, planes, kernal, strides_sizes[i], padding, layers) \
             for i in range(1, n_layers)))
+        self.final_conv = nn.Conv2d(4,1, kernel_size=1, padding=0, stride=1, bias=False)
         self.ff1 = FeedForward(260, 512, dim_out=256)
         self.ff2 = nn.Linear(256, 4)
+        self.act = nn.ReLU()
 
     def forward(self, x, dlc):
         inputs = self.L_embedder(x)  # [height, width, 4]
         inputs = self.L_encoder(inputs)  # [height/2, width/2, 4]
-        inputs = F.interpolate(inputs, size=(16, 16), align_corner=False, mode='Bicubic')  # [16, 16]
+        inputs = F.interpolate(inputs, size=(16, 16), align_corners=False, mode='bicubic')  # [16, 16]
+        inputs = self.final_conv(inputs)
         inputs = torch.cat((inputs.flatten(), dlc), dim=0)  # [260]
         inputs = self.ff1(inputs)  # [260]
-        inputs = nn.ReLU(inputs)  # [260]
+        inputs = self.act(inputs)  # [260]
         inputs = self.ff2(inputs)  # [4]
         return inputs
