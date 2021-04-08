@@ -15,9 +15,10 @@ class Player:
     def get_board_dlc(self, state):
         board, (x, y) = state
         bx, by = board.shape
-        def get_cord_val(x, y):
-            return torch.tensor(1) if x < 0 or y < 0 or bx >= x or by >= y else board[x, y]
-        dlc = torch.tensor([get_cord_val(x-1,y), get_cord_val(x+1,y), get_cord_val(x,y-1), get_cord_val(x,y+1)])
+        def get_cord_val(_x, _y):
+            return torch.tensor(1) if _x < 0 or _y < 0 or bx <= _x or by <= _y else torch.tensor(board[_x, _y])
+        dlc = torch.tensor([get_cord_val(x-1,y), get_cord_val(x+1,y), get_cord_val(x,y-1), get_cord_val(x,y+1)]).float()
+        
         return board, dlc.to(self.device)
 
     #forward pass
@@ -46,7 +47,7 @@ class Player:
         advantage = expected_returns
         logprobabilities = torch.log(probabilities)
         reinforce = (advantage * logprobabilities)
-        actor_loss =  - reinforce.mean()
+        actor_loss =  - reinforce.sum()
         #backwards pass
         self.optimiser.zero_grad()
         actor_loss.backward() # calculate gradient backpropagation
