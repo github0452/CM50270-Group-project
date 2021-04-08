@@ -16,8 +16,9 @@ while True:
     failed = False
     rewards = []
     while not (failed):
-        (board, players), reward, failed = g.step(p.getAction((torch.tensor(board).float(), players[0][0], players[0][1])))
-        rewards.append(-reward)
+        action = p.getAction(board, players[0])
+        (board, players), reward, failed = g.step(action)
+        rewards.append(reward)
         if not failed:
             (board, players), _, failed = g.step(np.random.randint(0, 4))
         # window.update_frame(board)
