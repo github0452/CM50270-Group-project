@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class Normalization(nn.Module):
     def __init__(self, embed_dim, normalization='batch'):
         super(Normalization, self).__init__()
@@ -13,7 +12,6 @@ class Normalization(nn.Module):
         self.normalizer = normalizer_class(embed_dim, affine=True)
         # Normalization by default initializes affine parameters with bias 0 and weight unif(0,1) which is too large!
         # self.init_parameters()
-
 
 class ResidueBlock(nn.Module):
     def __init__(self, inplanes=128, planes=128, kernel_size=3, stride=1, padding=1, downsample=None):
@@ -48,7 +46,6 @@ class FeedForward(nn.Sequential):
             nn.Linear(dim_hidden, dim_out)
         )  # initialise nn.Modules
 
-
 class Network(nn.Module):
     def __init__(self, planes=4, kernal=3, padding=1, layers=3, n_layers=3, \
                  strides_sizes=[2, 1, 1]):
@@ -63,7 +60,7 @@ class Network(nn.Module):
         self.act = nn.ReLU()
 
     def forward(self, x, dlc):
-        inputs = self.L_embedder(x)  # [height, width, 4]
+        inputs = self.L_embedder(x.unsqueeze(dim=0))  # [height, width, 4]
         inputs = self.L_encoder(inputs)  # [height/2, width/2, 4]
         inputs = F.interpolate(inputs, size=(16, 16), align_corners=False, mode='bicubic')  # [16, 16]
         inputs = self.final_conv(inputs)
