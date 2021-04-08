@@ -18,7 +18,6 @@ class Normalization(nn.Module):
 class ResidueBlock(nn.Module):
     def __init__(self, inplanes=128, planes=128, kernel_size=3, stride=1, padding=1, downsample=None):
         super(ResidueBlock, self).__init__()
-        print('my inplane', inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=kernel_size, stride=stride,
                                padding=padding, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
