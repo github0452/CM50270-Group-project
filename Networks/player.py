@@ -13,7 +13,7 @@ class Player:
         self.device = device
 
     def get_board_dlc(self, state):
-        board, x, y = state
+        board, (x, y) = state
         bx, by = board.shape
         def get_cord_val(x, y):
             return torch.tensor(1) if x < 0 or y < 0 or bx >= x or by >= y else board[x, y]
@@ -22,7 +22,7 @@ class Player:
 
     #forward pass
     def getAction(self, state, sampling=True):
-        board, dlc = get_board_dlc(state)
+        board, dlc = self.get_board_dlc(state)
         board = torch.tensor(board).unsqueeze(dim=0).unsqueeze(dim=0)
         probs = self.net(board, dlc).unsqueeze(dim=0)
         # select action

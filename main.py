@@ -18,7 +18,7 @@ while True:
     failed = False
     rewards = []
     while not (failed):
-        action = p.getAction(board, players[0])
+        action = p.getAction((board, players[0]))
         (board, players), reward, failed = g.step(action)
         rewards.append(reward)
         if not failed:
