@@ -13,8 +13,7 @@ def test():
     out = net.forward(map, dlc)
     print(out)
 
-dlc = torch.tensor([0,0,0,1])
-map = torch.rand((1, 1, 36, 36))
+
 net = Network()
 optimiser = optim.Adam(net.parameters(), lr=1e-3)
 # self.actor_scheduler = torch.optim.lr_scheduler.StepLR(optimiser, step_size=1, gamma=1)

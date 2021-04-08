@@ -13,7 +13,7 @@ class Game:
         self.board[tuple(self.players[0])] = 1
         self.board[tuple(self.players[1])] = 2
         self.player_turn = 0
-        return self.board
+        return self.board, self.players
 
     def step(self, action):
         player_pos = self.players[self.player_turn]
@@ -22,7 +22,4 @@ class Game:
         failed = self.board[tuple(player_pos)] != 0
         self.board[tuple(player_pos)] = 1 + self.player_turn
         self.player_turn = (self.player_turn + 1) % 2
-        return self.board, failed
-
-
-Game()
+        return (self.board, self.players), -10 if failed else 0,failed
