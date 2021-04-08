@@ -35,7 +35,7 @@ class ResidueBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
         out += residual if self.stride == 1 else out1
-        out = F.relu(out) 
+        out = F.relu(out)
         return out
 
 
@@ -71,4 +71,5 @@ class Network(nn.Module):
         inputs = self.ff1(inputs)  # [260]
         inputs = self.act(inputs)  # [260]
         inputs = self.ff2(inputs)  # [4]
+        inputs = F.softmax(inputs, dim=-1)
         return inputs
