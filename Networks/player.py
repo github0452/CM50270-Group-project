@@ -12,10 +12,17 @@ class Player:
         self.games_played = 0
         self.action_probs_list = []
 
+    def get_board_dlc(self, state):
+        board, x, y = state
+        bx, by = board.shape
+        def get_cord_val(x, y):
+            return torch.tensor(1) if x < 0 or y < 0 or bx >= x or by >= y else board[x, y]
+        dlc = torch.stack([get_cord_val(x-1,y), get_cord_val(x+1,y), get_cord_val(x,y-1), get_cord_val(x,y+1)]).flatten()
+        return board, dlc
+
     #forward pass
     def getAction(self, state, sampling=True):
-        board, x, y = state
-        dlc = torch.stack([board[x-1,y], board[x+1,y], board[x,y-1], board[x,y+1]]).flatten()
+        board, dlc = self.get_board_dlc(state)
         board = torch.tensor(board).unsqueeze(dim=0).unsqueeze(dim=0)
         probs = self.net(board, dlc).unsqueeze(dim=0)
         actions = probs.multinomial(1) if sampling \
