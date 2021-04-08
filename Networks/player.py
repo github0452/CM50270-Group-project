@@ -8,21 +8,20 @@ import torch.optim as optim
 class Player:
     def __init__(self):
         self.net = Network()
+        self.optimiser = optim.Adam(self.net.parameters(), lr=1e-3)
         self.games_played = 0
-        self.action = []
-        self.probs = []
+        self.action_probs_list = []
 
     #forward pass
     def getAction(self, state, sampling=True):
         board, x, y = state
-        dlc = torch.tensor(board[x-1:x+1,y-1:y+1].flatten())
-        board = torch.tensor(board)
-        probs = self.net(board, dlc)
-        actions = probs.multinomial(1).squeeze(1) if sampling \
+        dlc = torch.stack([board[x-1,y], board[x+1,y], board[x,y-1], board[x,y+1]]).flatten()
+        board = torch.tensor(board).unsqueeze(dim=0).unsqueeze(dim=0)
+        probs = self.net(board, dlc).unsqueeze(dim=0)
+        actions = probs.multinomial(1) if sampling \
             else probs.argmax(dim = 1) # pick an action, actions: torch.Size([100])
-        action_list.append(actions)
-        action_probs_list.append(probs[[x for x in range(len(probs))], actions])
-        return actions
+        self.action_probs_list.append(probs[[x for x in range(len(probs))], actions])
+        return actions.squeeze(dim=0).squeeze(dim=0).item()
 
     #backward pass
     def backward(self, reward_history):
@@ -31,21 +30,23 @@ class Player:
         reward_reversed = reward_history[::-1]
         next_return = 0
         for r in reward_reversed:
-            next_return = next_return * 0.9 + r
+            next_return = next_return * 0.9 + torch.tensor(r)
             flipped_returns.append(next_return)
         probabilities = torch.stack(self.action_probs_list, 0)
         expected_returns = torch.stack(flipped_returns[::-1], 0)
         # calculate actor loss
-        advantage = returns
+        advantage = expected_returns
         logprobabilities = torch.log(probabilities)
         reinforce = (advantage * logprobabilities)
         actor_loss = reinforce.mean()
         #backwards pass
-        optimiser.zero_grad()
+        self.optimiser.zero_grad()
         actor_loss.backward() # calculate gradient backpropagation
         # torch.nn.utils.clip_grad_norm_(net.parameters(), max_g, norm_type=2) # to prevent gradient expansion, set max
-        optimiser.step() # update weights
+        self.optimiser.step() # update weights
         # self.actor_scheduler.step()
+        #reset for next backward pass
+        self.action_probs_list = []
         return actor_loss
 
 
