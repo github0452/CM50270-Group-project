@@ -17,13 +17,13 @@ class Player:
         bx, by = board.shape
         def get_cord_val(x, y):
             return torch.tensor(1) if x < 0 or y < 0 or bx >= x or by >= y else board[x, y]
-        dlc = torch.stack([get_cord_val(x-1,y), get_cord_val(x+1,y), get_cord_val(x,y-1), get_cord_val(x,y+1)]).flatten()
-        return board, dlc
+        dlc = torch.tensor([get_cord_val(x-1,y), get_cord_val(x+1,y), get_cord_val(x,y-1), get_cord_val(x,y+1)])
+        return board, dlc.to(self.device)
 
     #forward pass
     def getAction(self, state, sampling=True):
         board, dlc = self.get_board_dlc(state)
-        board = torch.tensor(board).unsqueeze(dim=0).unsqueeze(dim=0)
+        board = torch.tensor(board).unsqueeze(dim=0).to(self.device).float()
         probs = self.net(board, dlc).unsqueeze(dim=0)
         # select action
         actions = probs.multinomial(1).squeeze(dim=0) if sampling \
