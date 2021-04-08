@@ -5,8 +5,10 @@ from game import Game
 import torch
 # from gui import GUI
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 g = Game()
-p = Player()
+p = Player(device)
 # window = GUI()
 
 g.reset()

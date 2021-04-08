@@ -6,17 +6,18 @@ import torch.nn as nn
 import torch.optim as optim
 
 class Player:
-    def __init__(self):
-        self.net = Network()
+    def __init__(self, device):
+        self.net = Network().to(device)
         self.optimiser = optim.Adam(self.net.parameters(), lr=1e-3)
         self.action_probs_list = []
+        self.device = device
 
     #forward pass
     def getAction(self, board, player_loc, sampling=True):
         # prep state info
         x, y = player_loc
-        board = torch.tensor(board).float() #convert board to tensor
-        dlc = torch.tensor([board[x-1,y], board[x+1,y], board[x,y-1], board[x,y+1]])
+        board = torch.tensor(board).to(self.device).float() #convert board to tensor
+        dlc = torch.tensor([board[x-1,y], board[x+1,y], board[x,y-1], board[x,y+1]]).to(self.device)
         # add batch size
         board = board.unsqueeze(dim=0)
         probs = self.net(board, dlc).unsqueeze(dim=0)
@@ -33,7 +34,7 @@ class Player:
         reward_reversed = reward_history[::-1]
         next_return = 0
         for r in reward_reversed:
-            next_return = next_return * 0.9 + torch.tensor(r)
+            next_return = next_return * 0.9 + torch.tensor(r).to(self.device)
             flipped_returns.append(next_return)
         probabilities = torch.stack(self.action_probs_list, 0)
         expected_returns = torch.stack(flipped_returns[::-1], 0)
