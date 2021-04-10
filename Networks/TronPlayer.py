@@ -1,5 +1,8 @@
 
 ## Net Player
+import os
+import os.path as path
+
 import torch
 import numpy as np
 import torch.nn as nn
@@ -24,6 +27,8 @@ class TronPlayer:
         self.eps   = np.finfo(np.float32).eps.item()
         self.epoch = 0
         self.depth = 5
+
+        self.load_weights(model_name) 
         
     def preprocess(self, _board, _location):
         proximity = np.array([self.depth] * len(actions))
@@ -82,14 +87,19 @@ class TronPlayer:
             if self.epoch % 1000 == 0:
                 self.save_weights(self.model_name)
 
-    def load_weights(self, _filename):
-        checkpoint = torch.load(_filename)
-        self.net.load_state_dict(checkpoint['model_state_dict'])
-        self.optimiser.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.epoch = checkpoint['epoch']
-        print('Loaded with', self.epoch, 'epochs.')
+    def load_weights(self, _model_name):
+        fname = path.join('models', _model_name)
+        if os.path.exists(fname): 
+            checkpoint = torch.load(fname)
+            self.net.load_state_dict(checkpoint['model_state_dict'])
+            self.optimiser.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.epoch = checkpoint['epoch']
+            print('Loaded with', self.epoch, 'epochs.')
+        else: 
+            print('weights not found for', _model_name)
 
-    def save_weights(self, _filename):
+    def save_weights(self, _model_name):
+        _filename = path.joing('models', _model_name)
         torch.save({
             'epoch': self.epoch,
             'model_state_dict': self.net.state_dict(),

@@ -7,7 +7,7 @@ from gui import GUI
 import settings as s
 
 g = Game()
-p = TronPlayer("models/p1")
+p = TronPlayer("default0")
 p2 = TronPlayer("models/p2")
 window = GUI()
 
