@@ -24,8 +24,9 @@ def tile_array(a, b0, b1):
 
 class GUI():
     def __init__(self, _name='untitled'):
-        self.buffer = np.random.rand(64, 64, 3)
-        self.wname = _name
+        self.buffer = np.zeros((64, 64, 3))
+        self.wname  = _name
+        self.inint  = False
 
         print('name', _name)
         cv.imshow(self.wname, self.buffer)
@@ -38,20 +39,23 @@ class GUI():
         _game_board = tile_array(_game_board, _s_.RENDER_SCALING,
                                  _s_.RENDER_SCALING)
 
-        buffer = np.zeros((self.wsize, self.hsize, 3), np.uint8)
+        if not self.inint:
+            self.buffer = np.zeros((self.wsize, self.hsize, 3), np.uint8)
+            self.inint = True
+        self.buffer[:, :] = 0
 
         for c in __Color__:
             if c == 0: continue
-            buffer[_game_board == c] = __Color__[c]
+            self.buffer[_game_board == c] = __Color__[c]
 
-        cv.imshow(self.wname, buffer)
+        cv.imshow(self.wname, self.buffer)
         cv.waitKey(_s_.RENDER_FPS_MS)
 
-# k = GUI('1')
-# g = GUI('2')
+k = GUI('1')
+g = GUI('2')
 
-# while(True):
-#     disp = np.ones((_s_.MAP_SIZE, _s_.MAP_SIZE))
-#     disp2= np.ones((30, 30))
-#     k.update_frame(disp)
-#     g.update_frame(disp2)
+while(True):
+    disp = np.ones((_s_.MAP_SIZE, _s_.MAP_SIZE))
+    disp2= np.ones((30, 30))
+    k.update_frame(disp)
+    g.update_frame(disp2)
