@@ -106,7 +106,7 @@ class TronPlayer:
             print('weights not found for', _model_name)
 
     def save_weights(self, _model_name):
-        _filename = path.joing('models', _model_name)
+        _filename = path.join('models', _model_name)
         torch.save({
             'epoch': self.epoch,
             'model_state_dict': self.net.state_dict(),
