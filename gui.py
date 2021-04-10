@@ -12,10 +12,8 @@ def r():
 
 __Color__ = {0: (0, 0, 0),
              1: (r(), r(), r()),
-             2: (r(), r(), r()),
-             3: (r(), r(), r()),
-             4: (r(), r(), r())}
-
+             -1: (r(), r(), r()),
+             -2: (r(), r(), r())}
 
 ##https://stackoverflow.com/questions/32846846/quick-way-to-upsample-numpy-array-by-nearest-neighbor-tiling
 def tile_array(a, b0, b1):

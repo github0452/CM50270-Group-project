@@ -14,9 +14,9 @@ class NetPlayer:
     def __init__(self, model_name='default'):
         super(NetPlayer, self).__init__()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print("running on", self.device)
         self.model_name = model_name
-        self.net = TronNet()
-        self.net = self.net.to(self.device)
+        self.net = TronNet().to(self.device)
         
         self.optimiser = optim.Adam(self.net.parameters(), lr=0.001)
         self.action_probs_list = []
@@ -56,7 +56,7 @@ class NetPlayer:
             saved_actions = self.action_probs_list
             policy_losses = []
             values_losses = []
-            returns       = []
+            returns    = []
 
             for r in self.action_rewards[::-1]:
                 R = r + 0.95 * R
@@ -79,7 +79,7 @@ class NetPlayer:
             self.action_probs_list = []
             self.action_rewards    = []
             self.epoch += 1
-            if self.epoch % 1000 == 0:
+            if self.epoch % 1000 == 2:
                 self.save_weights(self.model_name)
 
     def load_weights(self, _filename):
