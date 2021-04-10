@@ -23,12 +23,17 @@ def tile_array(a, b0, b1):
     return x.reshape(r * b0, c * b1)  # create new 2D array
 
 class GUI():
+    WINDOW_ID = 0
+    @staticmethod
+    def get_id():
+        GUI.WINDOW_ID+=1
+        return GUI.WINDOW_ID
+
     def __init__(self, _name='untitled'):
         self.buffer = np.zeros((64, 64, 3))
-        self.wname  = _name
+        self.wname  = f'{GUI.get_id():03d}' + ' : ' + _name
         self.inint  = False
 
-        print('name', _name)
         cv.imshow(self.wname, self.buffer)
 
     def update_frame(self, _game_board):
@@ -50,12 +55,3 @@ class GUI():
 
         cv.imshow(self.wname, self.buffer)
         cv.waitKey(_s_.RENDER_FPS_MS)
-
-k = GUI('1')
-g = GUI('2')
-
-while(True):
-    disp = np.ones((_s_.MAP_SIZE, _s_.MAP_SIZE))
-    disp2= np.ones((30, 30))
-    k.update_frame(disp)
-    g.update_frame(disp2)

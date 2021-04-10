@@ -22,7 +22,7 @@ class TronPlayer:
         self.model_name = model_name
         self.net = TronNet().to(self.device)
         self.view = np.ones((s.MAP_SIZE * 2 - 5, s.MAP_SIZE * 2 - 5))
-        self.g = GUI("bitch" + str(np.random.random()))
+        self.g = GUI(model_name)
         
         self.optimiser = optim.Adam(self.net.parameters(), lr=0.001)
         self.action_probs_list = []
