@@ -10,9 +10,9 @@ from torch.distributions import Categorical
 from game import actions
 from Networks.TronNet import TronNet
 
-class NetPlayer:
+class TronPlayer:
     def __init__(self, model_name='default'):
-        super(NetPlayer, self).__init__()
+        super(TronPlayer, self).__init__()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         print("running on", self.device)
         self.model_name = model_name
@@ -79,7 +79,7 @@ class NetPlayer:
             self.action_probs_list = []
             self.action_rewards    = []
             self.epoch += 1
-            if self.epoch % 1000 == 2:
+            if self.epoch % 1000 == 0:
                 self.save_weights(self.model_name)
 
     def load_weights(self, _filename):

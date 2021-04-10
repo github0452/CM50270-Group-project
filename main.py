@@ -1,16 +1,14 @@
 import numpy as np
 
-from Networks.TronPlayer import NetPlayer
+from Networks.TronPlayer import TronPlayer
 from game import Game
 import torch
 from gui import GUI
 import settings as s
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 g = Game()
-p = NetPlayer(device)
-p2 = NetPlayer(device)
+p = TronPlayer("models/p1")
+p2 = TronPlayer("models/p2")
 window = GUI()
 
 g.reset()
