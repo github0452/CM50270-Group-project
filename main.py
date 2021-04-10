@@ -8,16 +8,13 @@ import settings as s
 
 g = Game()
 p = TronPlayer("default0")
-p2 = TronPlayer("models/p2")
+p2 = TronPlayer("default0")
 window = GUI()
 
 g.reset()
 
-game_num = 0
 
 while True:
-    game_num += 1
-    show_gui = True if game_num % s.SHOW_GUI_EVERY == 0 else False
     board, players = g.reset()
     failed = False
     rewards = []
@@ -30,5 +27,4 @@ while True:
         failed = failed1 or failed2
         p.update_reward(reward1, failed)
         p2.update_reward(reward2, failed)
-        if show_gui:
-            window.update_frame(board)
+        window.update_frame(board)

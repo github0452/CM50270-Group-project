@@ -2,7 +2,7 @@
 ## Net Player
 import os
 import os.path as path
-
+import settings as s
 import torch
 import numpy as np
 import torch.nn as nn
@@ -12,6 +12,7 @@ from torch.distributions import Categorical
 
 from game import actions
 from Networks.TronNet import TronNet
+from gui import GUI
 
 class TronPlayer:
     def __init__(self, model_name='default'):
@@ -20,6 +21,8 @@ class TronPlayer:
         print("running on", self.device)
         self.model_name = model_name
         self.net = TronNet().to(self.device)
+        self.view = np.ones((s.MAP_SIZE * 2 - 5, s.MAP_SIZE * 2 - 5))
+        self.g = GUI("bitch" + str(np.random.random()))
         
         self.optimiser = optim.Adam(self.net.parameters(), lr=0.001)
         self.action_probs_list = []
@@ -40,14 +43,18 @@ class TronPlayer:
                 
         proximity = torch.tensor(proximity).float()
         proximity = proximity.unsqueeze(dim=0)
-        _board = torch.tensor(_board).unsqueeze(dim=0).unsqueeze(dim=0)
+        self.view[:,:] = 1
+        self.view[s.MAP_SIZE - 2 - _location[0]: s.MAP_SIZE * 2 - 4 - _location[0],
+                s.MAP_SIZE - 2 - _location[1]: s.MAP_SIZE * 2 - 4 - _location[1]] = _board[1:-1, 1:-1]
+        self.g.update_frame(self.view)
+        _board = torch.tensor(self.view).unsqueeze(dim=0).unsqueeze(dim=0)
         return _board.to(self.device).float(), proximity.to(self.device)
     
     def get_action(self, _board, _location):
-        board, dlc   = self.preprocess(_board, _location)
+        board, dlc = self.preprocess(_board, _location)
         probs, value = self.net(board, dlc)
 
-        m      = Categorical(probs)
+        m = Categorical(probs)
         action = m.sample()
 
         self.action_probs_list.append((m.log_prob(action), value))
