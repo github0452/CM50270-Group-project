@@ -9,13 +9,13 @@ class TronNet(nn.Module):
         ## For Board
         self.conv1 = nn.Conv2d(1, 4, 3, padding=1)
         self.pool  = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(4, 16, 3, padding=1)
+        self.conv2 = nn.Conv2d(4, 2, 3, padding=1)
 
         ## For DLC
         self.fc0 = nn.Linear(4, 32)
-
+    
         ## For combined Board & DLC
-        self.fc1 = nn.Linear(16 * 16 + 32, 512)
+        self.fc1 = nn.Linear(16 * 16 * 2 + 32, 512)
         self.fc2 = nn.Linear(512, 128)
         self.fc3 = nn.Linear(128,  64)
         self.fc4 = nn.Linear( 64,   4)
@@ -24,12 +24,13 @@ class TronNet(nn.Module):
     ## Board, dynamic game board size matrix
     ## dlc  , any vector of size 4
     def forward(self, board, dlc):
+        # board = torch.zeros_like(board)
         board = F.relu(self.conv1(board))
         board = F.relu(self.conv2(board))
-        board = F.interpolate(board, size=(4, 4), 
+        board = F.interpolate(board, size=(16, 16), 
                               mode='bicubic', 
                               align_corners=False)            
-        board = board.view(-1, 16 * 4 * 4)
+        board = board.view(-1, 2 * 16 * 16)
         dlc = F.relu(self.fc0(dlc))
         combined = torch.cat([board, dlc], dim=-1)        
         combined = F.relu(self.fc1(combined))
@@ -41,6 +42,3 @@ class TronNet(nn.Module):
         
         # print('last', combined, critic)
         return combined, critic
-
-
-
