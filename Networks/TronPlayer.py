@@ -7,10 +7,10 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.distributions import Categorical
 
-from Players.Player import Player
-from Network.Network import TronNet
+from game import actions
+from Networks.TronNet import TronNet
 
-class NetPlayer(Player):
+class NetPlayer:
     def __init__(self, model_name='default'):
         super(NetPlayer, self).__init__()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -24,27 +24,12 @@ class NetPlayer(Player):
         self.eps   = np.finfo(np.float32).eps.item()
         self.epoch = 0
         self.depth = 5
-
-    def load_weights(self, _filename):
-        checkpoint = torch.load(_filename)
-        self.net.load_state_dict(checkpoint['model_state_dict'])
-        self.optimiser.load_state_dict(checkpoint['optimizer_state_dict'])
-        self.epoch = checkpoint['epoch']
-        print('Loaded with', self.epoch, 'epochs.')
-    
-    def save_weights(self, _filename):
-        torch.save({
-            'epoch': self.epoch,
-            'model_state_dict': self.net.state_dict(),
-            'optimizer_state_dict': self.optimiser.state_dict(),
-            }, _filename)
-        print('Model saved.')
         
-    def preprocess(self, _board, _location, _actions):
-        proximity = np.array([self.depth] * len(_actions))
-        for i in range(len(_actions)):
+    def preprocess(self, _board, _location):
+        proximity = np.array([self.depth] * len(actions))
+        for i in range(len(actions)):
             for p in range(self.depth):
-                if _board[tuple(_location + ((p+1) * _actions[i]) )] != 0:
+                if _board[tuple(_location + ((p+1) * actions[i]) )] != 0:
                     proximity[i] = p
                     break
                 
@@ -53,8 +38,8 @@ class NetPlayer(Player):
         _board = torch.tensor(_board).unsqueeze(dim=0).unsqueeze(dim=0)
         return _board.to(self.device).float(), proximity.to(self.device)
     
-    def get_action(self, _board, _location, _actions):
-        board, dlc   = self.preprocess(_board, _location, _actions)
+    def get_action(self, _board, _location):
+        board, dlc   = self.preprocess(_board, _location)
         probs, value = self.net(board, dlc)
 
         m      = Categorical(probs)
@@ -83,9 +68,7 @@ class NetPlayer(Player):
             for (log_prob, value), R in zip(self.action_probs_list, returns):
                 advantage = R - value.item()
                 policy_losses.append(-log_prob * advantage)
-                values_losses.append(
-                    F.smooth_l1_loss(value, 
-                                     torch.tensor([[R]]).to(self.device)))
+                values_losses.append(F.smooth_l1_loss(value, torch.tensor([[R]]).to(self.device)))
 
             self.optimiser.zero_grad()
             loss = torch.stack(policy_losses).sum() +\
@@ -98,3 +81,18 @@ class NetPlayer(Player):
             self.epoch += 1
             if self.epoch % 1000 == 0:
                 self.save_weights(self.model_name)
+
+    def load_weights(self, _filename):
+        checkpoint = torch.load(_filename)
+        self.net.load_state_dict(checkpoint['model_state_dict'])
+        self.optimiser.load_state_dict(checkpoint['optimizer_state_dict'])
+        self.epoch = checkpoint['epoch']
+        print('Loaded with', self.epoch, 'epochs.')
+
+    def save_weights(self, _filename):
+        torch.save({
+            'epoch': self.epoch,
+            'model_state_dict': self.net.state_dict(),
+            'optimizer_state_dict': self.optimiser.state_dict(),
+        }, _filename)
+        print('Model saved.')
