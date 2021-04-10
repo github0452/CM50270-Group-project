@@ -22,21 +22,23 @@ def tile_array(a, b0, b1):
     x = as_strided(a, (r, b0, c, b1), (rs, 0, cs, 0))  # view a as larger 4D array
     return x.reshape(r * b0, c * b1)  # create new 2D array
 
-
 class GUI():
     def __init__(self, _name='untitled'):
         self.buffer = np.random.rand(64, 64, 3)
         self.wname = _name
-        self.whsize = _s_.MAP_SIZE * _s_.RENDER_SCALING
-        ### define a default window name
 
+        print('name', _name)
         cv.imshow(self.wname, self.buffer)
 
     def update_frame(self, _game_board):
+        w, h = _game_board.shape
+        self.wsize =  w * _s_.RENDER_SCALING
+        self.hsize =  h * _s_.RENDER_SCALING
+
         _game_board = tile_array(_game_board, _s_.RENDER_SCALING,
                                  _s_.RENDER_SCALING)
 
-        buffer = np.zeros((self.whsize, self.whsize, 3), np.uint8)
+        buffer = np.zeros((self.wsize, self.hsize, 3), np.uint8)
 
         for c in __Color__:
             if c == 0: continue
@@ -44,3 +46,12 @@ class GUI():
 
         cv.imshow(self.wname, buffer)
         cv.waitKey(_s_.RENDER_FPS_MS)
+
+# k = GUI('1')
+# g = GUI('2')
+
+# while(True):
+#     disp = np.ones((_s_.MAP_SIZE, _s_.MAP_SIZE))
+#     disp2= np.ones((30, 30))
+#     k.update_frame(disp)
+#     g.update_frame(disp2)
