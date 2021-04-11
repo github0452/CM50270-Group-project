@@ -1,23 +1,30 @@
 import numpy as np
 
-from Networks.player import Player
+from Networks.TronPlayer import TronPlayer
 from game import Game
+import torch
 from gui import GUI
+import settings as s
 
 g = Game()
-p = Player()
+p = TronPlayer("default0")
+p2 = TronPlayer("default0")
 window = GUI()
 
 g.reset()
+
 
 while True:
     board, players = g.reset()
     failed = False
     rewards = []
+    rewards2 = []
     while not (failed):
-        (board, players), reward, failed = g.step(p.getAction((board, players[0][0], players[0][1])))
-        rewards.append(torch.tensor(reward))
-        if not failed:
-            (board, players), _, failed = g.step(np.random.randint(0, 4))
+        action = p.get_action(board, players[0])
+        (board, players), reward1, failed1 = g.step(action)
+        action = p2.get_action(board, players[1])
+        (board, players), reward2, failed2 = g.step(action)
+        failed = failed1 or failed2
+        p.update_reward(reward1, failed)
+        p2.update_reward(reward2, failed)
         window.update_frame(board)
-    p.backward(torch.stack(rewards, 0))
