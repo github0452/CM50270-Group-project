@@ -1,6 +1,6 @@
 import numpy as np
 
-from Networks.TronPlayer import TronPlayer
+from Networks.ton_player import TronPlayer
 from game import Game
 import torch
 from gui import GUI
