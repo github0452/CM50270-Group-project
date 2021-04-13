@@ -10,7 +10,7 @@ import settings as s
 
 g = Game()
 p = TronPlayer("default0")
-p2 = TronPlayer("default0")
+p2 = TronPlayer("default1")
 window = GUI()
 g.reset()
 

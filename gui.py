@@ -30,11 +30,12 @@ class GUI():
         return GUI.WINDOW_ID
 
     def __init__(self, _name='untitled'):
-        self.buffer = np.zeros((64, 64, 3))
-        self.wname  = f'{GUI.get_id():03d}' + ' : ' + _name
-        self.inint  = False
+        if _s_.SHOW_GUI:
+            self.buffer = np.zeros((64, 64, 3))
+            self.wname  = f'{GUI.get_id():03d}' + ' : ' + _name
+            self.inint  = False
 
-        cv.imshow(self.wname, self.buffer)
+            cv.imshow(self.wname, self.buffer)
 
     def update_frame(self, _game_board):
         if _s_.SHOW_GUI:
