@@ -37,21 +37,19 @@ class GUI():
         cv.imshow(self.wname, self.buffer)
 
     def update_frame(self, _game_board):
-        w, h = _game_board.shape
-        self.wsize =  w * _s_.RENDER_SCALING
-        self.hsize =  h * _s_.RENDER_SCALING
+        if _s_.SHOW_GUI:
+            w, h = _game_board.shape
+            self.wsize =  w * _s_.RENDER_SCALING
+            self.hsize =  h * _s_.RENDER_SCALING
 
-        _game_board = tile_array(_game_board, _s_.RENDER_SCALING,
-                                 _s_.RENDER_SCALING)
+            _game_board = tile_array(_game_board, _s_.RENDER_SCALING,
+                                    _s_.RENDER_SCALING)
 
-        if not self.inint:
             self.buffer = np.zeros((self.wsize, self.hsize, 3), np.uint8)
-            self.inint = True
-        self.buffer[:, :] = 0
 
-        for c in __Color__:
-            if c == 0: continue
-            self.buffer[_game_board == c] = __Color__[c]
+            for c in __Color__:
+                if c == 0: continue
+                self.buffer[_game_board == c] = __Color__[c]
 
-        cv.imshow(self.wname, self.buffer)
-        cv.waitKey(_s_.RENDER_FPS_MS)
+            cv.imshow(self.wname, self.buffer)
+            cv.waitKey(_s_.RENDER_FPS_MS)
