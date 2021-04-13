@@ -32,27 +32,21 @@ class TronPlayer:
         self.depth = 5
 
         self.load_weights(model_name) 
-        
+
+    def update_window_size(self, size):
+        self.view = np.ones((size * 2 - 5, size * 2 - 5))
+
     def preprocess(self, _board, _location):
-        proximity = np.array([self.depth] * len(actions))
-        for i in range(len(actions)):
-            for p in range(self.depth):
-                if _board[tuple(_location + ((p+1) * actions[i]) )] != 0:
-                    proximity[i] = p
-                    break
-                
-        proximity = torch.tensor(proximity).float()
-        proximity = proximity.unsqueeze(dim=0)
         self.view[:,:] = 1
         self.view[s.MAP_SIZE - 2 - _location[0]: s.MAP_SIZE * 2 - 4 - _location[0],
                 s.MAP_SIZE - 2 - _location[1]: s.MAP_SIZE * 2 - 4 - _location[1]] = _board[1:-1, 1:-1]
         self.g.update_frame(self.view)
         _board = torch.tensor(self.view).unsqueeze(dim=0).unsqueeze(dim=0)
-        return _board.to(self.device).float(), proximity.to(self.device)
+        return _board.to(self.device).float()
     
     def get_action(self, _board, _location):
-        board, dlc = self.preprocess(_board, _location)
-        probs, value = self.net(board, dlc)
+        board = self.preprocess(_board, _location)
+        probs, value = self.net(board)
 
         m = Categorical(probs)
         action = m.sample()
