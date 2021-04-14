@@ -2,7 +2,8 @@ import time
 import numpy as np
 from datetime import timedelta
 
-from Networks.ton_player import TronPlayer
+from Networks.tron_player import TronPlayer
+from Networks.tron_q_learning import TronQLearning
 from game import Game
 import torch
 from gui import GUI
@@ -33,7 +34,7 @@ def train(epochs=5000, update_interval=500):
             p2.update_reward(reward2, failed)
             window.update_frame(board)
             steps += 1
-        if epoch % update_interval == 0: 
+        if epoch % update_interval == 0:
             print("Elapsed time:", str(timedelta(seconds=(time.time() - stime) )),
                   "Epoch:", str(epoch) + '/' + str(epochs), "Average game steps:", steps/update_interval)
             stime = time.time()
