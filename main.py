@@ -9,8 +9,8 @@ from gui import GUI
 import settings as s
 
 g = Game()
-p = TronPlayer("default0")
-p2 = TronPlayer("default1")
+p = TronQLearning()
+p2 = TronQLearning()#TronPlayer("default0")
 window = GUI()
 g.reset()
 

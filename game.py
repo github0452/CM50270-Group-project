@@ -2,7 +2,7 @@ import numpy as np
 
 import settings as s
 
-actions = {0: np.array([1, 0]), 1: np.array([-1, 0]), 2: np.array([0, 1]), 3: np.array([0, -1])}
+actions = {0: np.array([1, 0]), 1: np.array([0, 1]), 2: np.array([-1, 0]), 3: np.array([0, -1])}
 
 class Game:
     def reset(self):
