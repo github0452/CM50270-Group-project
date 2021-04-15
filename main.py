@@ -35,13 +35,14 @@ def train(epochs=5000, update_interval=500):
             window.update_frame(board)
             steps += 1
         if epoch % update_interval == 0:
-            print("Elapsed time:", str(timedelta(seconds=(time.time() - stime) )),
-                  "Epoch:", str(epoch) + '/' + str(epochs), "Average game steps:", steps/update_interval)
+            print("Elapsed time: {0} Epoch: {1}/{2} Average game steps: {3}".format(str(timedelta(seconds=(time.time() - stime) )), str(epoch), str(epochs), steps/update_interval))
+            p.save_weights()
+            p2.save_weights()
             stime = time.time()
             steps = 0
 
 def main():
-    window_sizes = [9, 15, 25, 35, 45, 55]
+    window_sizes = [7, 9, 15, 25, 35, 45, 55]
     for w in window_sizes:
         ## change window size then train
         s.MAP_SIZE=w
@@ -50,7 +51,7 @@ def main():
         p.update_window_size(w)
         p2.update_window_size(w)
         ## Train
-        train(epochs=5000)
+        train(epochs=10000, update_interval=1000)
 
 if __name__ == "__main__":
     main()

@@ -23,7 +23,7 @@ class TronPlayer:
         self.net = TronNet().to(self.device)
         self.view = np.ones((s.MAP_SIZE * 2 - 5, s.MAP_SIZE * 2 - 5))
         self.g = GUI(model_name)
-        
+
         self.optimiser = optim.Adam(self.net.parameters(), lr=0.001)
         self.action_probs_list = []
         self.action_rewards    = []
@@ -31,7 +31,7 @@ class TronPlayer:
         self.epoch = 0
         self.depth = 5
 
-        self.load_weights(model_name) 
+        self.load_weights()
 
     def update_window_size(self, size):
         self.view = np.ones((size * 2 - 5, size * 2 - 5))
@@ -43,7 +43,7 @@ class TronPlayer:
         self.g.update_frame(self.view)
         _board = torch.tensor(self.view).unsqueeze(dim=0).unsqueeze(dim=0)
         return _board.to(self.device).float()
-    
+
     def get_action(self, _board, _location):
         board = self.preprocess(_board, _location)
         probs, value = self.net(board)
@@ -56,7 +56,7 @@ class TronPlayer:
 
     def update_reward(self, _reward, _end_game):
         self.action_rewards.append(_reward)
-    
+
         if _end_game:
             R = 0
             saved_actions = self.action_probs_list
@@ -85,22 +85,22 @@ class TronPlayer:
             self.action_probs_list = []
             self.action_rewards    = []
             self.epoch += 1
-            if self.epoch % 1000 == 0:
-                self.save_weights(self.model_name)
+            # if self.epoch % 1000 == 0:
+            #     self.save_weights(self.model_name)
 
-    def load_weights(self, _model_name):
-        fname = path.join('models', _model_name)
-        if os.path.exists(fname): 
+    def load_weights(self):
+        fname = path.join('models', self.model_name)
+        if os.path.exists(fname):
             checkpoint = torch.load(fname)
             self.net.load_state_dict(checkpoint['model_state_dict'])
             self.optimiser.load_state_dict(checkpoint['optimizer_state_dict'])
             self.epoch = checkpoint['epoch']
             print('Loaded with', self.epoch, 'epochs.')
-        else: 
-            print('weights not found for', _model_name)
+        else:
+            print('weights not found for', self.model_name)
 
-    def save_weights(self, _model_name):
-        _filename = path.join('models', _model_name)
+    def save_weights(self):
+        _filename = path.join('models', self.model_name)
         torch.save({
             'epoch': self.epoch,
             'model_state_dict': self.net.state_dict(),

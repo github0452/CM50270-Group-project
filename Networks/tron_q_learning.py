@@ -36,8 +36,8 @@ class TronQLearning:
         if self.reward != None:
             self.num_steps += 1
             self.update_table(self.board)
-            if self.num_steps % 500 == 0:
-                self.save_weights()
+            # if self.num_steps % 500 == 0:
+            #     self.save_weights()
         self.board = self.preprocess(_board, _location)
         if np.random.random() < self.epsilon:
             self.action = np.random.randint(0,4)
