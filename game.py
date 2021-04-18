@@ -11,8 +11,8 @@ class Game:
         if s.MAP_BORDER:
             self.board[[0, -1],:] = 1
             self.board[:, [0, -1]] = 1
-        self.board[tuple(self.players[0])] = -1
-        self.board[tuple(self.players[1])] = -2
+        # self.board[tuple(self.players[0])] = -1
+        # self.board[tuple(self.players[1])] = -2
         self.player_turn = 0
         return self.board, self.players
 
@@ -25,6 +25,6 @@ class Game:
         self.board[tuple(player_pos)] = 1
         player_pos += actions[action]
         failed = self.out_bounds(player_pos) or self.board[tuple(player_pos)] != 0
-        self.board[tuple(player_pos)] = - 1 - self.player_turn
+        # self.board[tuple(player_pos)] = - 1 - self.player_turn
         self.player_turn = (self.player_turn + 1) % 2
         return (self.board, self.players), -10 if failed else 1 ,failed
