@@ -4,13 +4,14 @@ from datetime import timedelta
 
 from Networks.tron_player import TronPlayer
 from Networks.tron_q_learning import TronQLearning
+from Networks.tron_DQN import TronPlayerDQN
 from game import Game
 import torch
 from gui import GUI
 import settings as s
 
 g = Game()
-p = TronQLearning()
+p = TronPlayerDQN()
 p2 = TronQLearning()#TronPlayer("default0")
 window = GUI()
 g.reset()
@@ -26,11 +27,12 @@ def train(epochs=5000, update_interval=500):
         rewards2 = []
         while not (failed):
             action = p.get_action(board, players[0])
-            (board, players), reward1, failed1 = g.step(action)
+            (next_board, players), reward1, failed1 = g.step(action)
             action = p2.get_action(board, players[1])
             (board, players), reward2, failed2 = g.step(action)
             failed = failed1 or failed2
-            p.update_reward(reward1, failed)
+            # def train_model(self, n_batch, state, action, next_state, reward, end_game):
+            p.train_model(reward1, failed)
             p2.update_reward(reward2, failed)
             window.update_frame(board)
             steps += 1
