@@ -35,7 +35,7 @@ class ReplayMem(object):
     def __len__(self):
         return len(self.memory)
 
-class TronNet2(nn.Module):
+class TronNetDQN(nn.Module):
     def __init__(self):
         super(TronNet, self).__init__()
         ## For Board
@@ -68,9 +68,9 @@ class TronPlayerDQN:
         self.view = np.ones((s.MAP_SIZE * 2 - 5, s.MAP_SIZE * 2 - 5))
         self.target_update = 10
         # models
-        self.policy_net = TronNet2().to(self.device)
+        self.policy_net = TronNetDQN().to(self.device)
         self.load_weights()
-        self.target_net = TronNet2().to(self.device)
+        self.target_net = TronNetDQN().to(self.device)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.memory = ReplayMemory(10000)
         # optimisers
