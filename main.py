@@ -33,7 +33,7 @@ def train(epochs=5000, update_interval=500):
             failed = failed1 or failed2
             # def train_model(self, n_batch, state, action, next_state, reward, end_game):
             p.train_model(100, raw_state, action1, next_raw_state, reward1, failed)
-            p2.update_reward(reward2, failed)
+            p2.train_model()
             raw_state = next_raw_state
             window.update_frame(raw_state[0])
             steps += 1

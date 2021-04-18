@@ -1,5 +1,6 @@
 from game import Game
 import numpy as np
+import random
 
 g = Game()
 
@@ -18,13 +19,13 @@ class TronPlayerBOT:
         for action in [0, 1, 2, 3]:
             player_pos = loc
             player_pos += actions[action]
-            out_bounds = True if player_pos[0] < 0 or player_pos[1] < 0 or player_pos[0] >= bx or player_pos[1] >= by else False
+            out_bounds = True if player_pos[0] < 0 or player_pos[1] < 0 or player_pos[0] >= 6 or player_pos[1] >= 6 else False
             if out_bounds or board[tuple(player_pos)] != 0:
-                actions_no.pop(action)
+                actions_no.remove(action)
         return random.choice(actions_no)
 
 
-    def train_model(self, n_batch, raw_state, action, next_raw_state, reward, end_game):
+    def train_model(self):
         pass
 
     def load_weights(self):
