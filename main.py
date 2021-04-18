@@ -4,7 +4,8 @@ from datetime import timedelta
 
 from Networks.tron_player import TronPlayer
 from Networks.tron_q_learning import TronQLearning
-from Networks.DQN import TronPlayerDQN
+from Networks.DQNPlayer import TronPlayerDQN
+from Networks.BotPlayer import TronPlayerBOT
 from game import Game
 import torch
 from gui import GUI
@@ -12,7 +13,7 @@ import settings as s
 
 g = Game()
 p = TronPlayerDQN()
-p2 = TronQLearning()#TronPlayer("default0")
+p2 = TronPlayerBOT()#TronPlayer("default0")
 window = GUI()
 g.reset()
 
@@ -26,7 +27,7 @@ def train(epochs=5000, update_interval=500):
         rewards2 = []
         while not (failed):#
             action1 = p.get_action(raw_state)
-            action2 = p2.get_action(raw_state[0], raw_state[1][1])
+            action2 = p2.get_action(raw_state, 1)
             next_raw_state, reward1, failed1 = g.step(action1.item())
             next_raw_state, reward2, failed2 = g.step(action2)
             failed = failed1 or failed2
